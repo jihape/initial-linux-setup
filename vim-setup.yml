@@ -1,0 +1,143 @@
+---
+
+- hosts: all
+  tasks:
+    - name: install vim
+      become: yes
+      yum:
+        name: vim
+        state: latest
+    
+    # install pathogen
+    - name: install pathogen
+      shell: mkdir -p ~/.vim/autoload ~/.vim/bundle && curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+    - name: add pathogen to vimrc
+      lineinfile:
+        path: ~/.vimrc
+        state: present
+        line: 'execute pathogen#infect()'
+        
+    - name: add settings to vimrc
+      lineinfile:
+        path: ~/.vimrc
+        state: present
+        line: 'syntax on'
+
+    - name: add settings to vimrc
+      lineinfile:
+        path: ~/.vimrc
+        state: present
+        line: 'filetype plugin indent on'
+
+    - name: install vim-sensible
+      git:
+        repo: git://github.com/tpope/vim-sensible.git
+        dest: ~/.vim/bundle/vim-sensible
+
+    - name: install vim-airline
+      git:
+        repo: https://github.com/vim-airline/vim-airline
+        dest: ~/.vim/bundle/vim-airline
+
+    - name: install syntastic 
+      git:
+        repo: https://github.com/vim-syntastic/syntastic.git
+        dest: ~/.vim/bundle/syntastic
+        depth: 1
+
+    - name: install NerdTree 
+      git:
+        repo: https://github.com/scrooloose/nerdtree.git
+        dest: ~/.vim/bundle/nerdtree
+    
+    - name: add solarized settings to vimrc
+      blockinfile:
+        dest: ~/.vimrc
+        state: present
+        block: |
+          " Enable NERDTree
+          autocmd vimenter * NERDTree
+
+          " Add CTRL+N to toggle NERDTree
+          map <C-t> :NERDTreeToggle<CR>
+
+    - name: install solarized colors
+      git:
+        repo: git://github.com/altercation/vim-colors-solarized.git
+        dest: ~/.vim/vim-colors-solarized
+
+    - name: add solarized settings to vimrc
+      blockinfile:
+        dest: ~/.vimrc
+        state: present
+        block: |
+          " Enable solarized
+          syntax on
+          let g:solarized_termcolors=256
+          set t_Co=256
+          set background=dark
+          colorscheme solarized
+
+    - name: add general settings to vimrc
+      blockinfile:
+        dest: ~/.vimrc
+        state: present
+        block: |
+          " Set the tab sizing
+          " show existing tab with 2 spaces width
+          set tabstop=2
+          " when indenting with '>', use 2 spaces width
+          set shiftwidth=2
+          " On pressing tab, insert 2 spaces
+          set expandtab
+
+          " disable EX mode
+          map Q <Nop>
+
+          " set relative line numbers
+          function! NumberToggle()
+            if(&relativenumber == 1)
+              set number
+              set norelativenumber
+            else
+              set relativenumber
+              set number
+            endif
+          endfunc
+
+          nnoremap <C-n> :call NumberToggle()<CR>
+
+          call NumberToggle()
+
+          "This unsets the "last search pattern" register by hitting return
+          nnoremap <CR> :noh<CR><CR>
+
+
+    - name: add solarized settings to vimrc
+      blockinfile:
+        dest: ~/.vimrc
+        state: present
+        block: |
+          " Syntastic settings
+          set statusline+=%#warningmsg#
+          set statusline+=%{SyntasticStatuslineFlag()}
+          set statusline+=%*
+
+          let g:syntastic_always_populate_loc_list = 1
+          let g:syntastic_auto_loc_list = 1
+          let g:syntastic_check_on_open = 1
+          let g:syntastic_check_on_wq = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
