@@ -4,29 +4,44 @@
   tasks:
     - name: install vim
       become: yes
-      yum:
+      dnf:
         name: vim
         state: latest
-    
+      ignore_errors: yes
+
     # install pathogen
+    - name: create autoload dir
+      file:
+        path: ~/.vim/autoload
+        state: directory
+    
+    - name: create bundle dir
+      file:
+        path: ~/.vim/bundle
+        state: directory
+    #
     - name: install pathogen
-      shell: mkdir -p ~/.vim/autoload ~/.vim/bundle && curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+      get_url:
+        dest: ~/.vim/autoload/pathogen.vim 
+        url: https://tpo.pe/pathogen.vim
 
     - name: add pathogen to vimrc
       lineinfile:
-        path: ~/.vimrc
+        dest: ~/.vimrc
         state: present
+        create: yes
+        backup: yes
         line: 'execute pathogen#infect()'
         
     - name: add settings to vimrc
       lineinfile:
-        path: ~/.vimrc
+        dest: ~/.vimrc
         state: present
         line: 'syntax on'
 
     - name: add settings to vimrc
       lineinfile:
-        path: ~/.vimrc
+        dest: ~/.vimrc
         state: present
         line: 'filetype plugin indent on'
 
@@ -55,6 +70,7 @@
       blockinfile:
         dest: ~/.vimrc
         state: present
+        marker: ""
         block: |
           " Enable NERDTree
           autocmd vimenter * NERDTree
@@ -65,12 +81,13 @@
     - name: install solarized colors
       git:
         repo: git://github.com/altercation/vim-colors-solarized.git
-        dest: ~/.vim/vim-colors-solarized
+        dest: ~/.vim/bundle/vim-colors-solarized
 
     - name: add solarized settings to vimrc
       blockinfile:
         dest: ~/.vimrc
         state: present
+        marker: ""
         block: |
           " Enable solarized
           syntax on
@@ -83,6 +100,7 @@
       blockinfile:
         dest: ~/.vimrc
         state: present
+        marker: ""
         block: |
           " Set the tab sizing
           " show existing tab with 2 spaces width
@@ -118,6 +136,7 @@
       blockinfile:
         dest: ~/.vimrc
         state: present
+        marker: ""
         block: |
           " Syntastic settings
           set statusline+=%#warningmsg#
